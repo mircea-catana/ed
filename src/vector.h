@@ -1,6 +1,10 @@
 #pragma once
 
-#include "ed.h"
+#ifndef _VECTOR_H_
+#define _VECTOR_H_
+
+#include <algorithm>
+#include <cmath>
 
 namespace ed
 {
@@ -85,62 +89,62 @@ namespace ed
     *   Vector2 Operators                                                          *
     *******************************************************************************/
 
-    Vector2 operator+ (float s, const Vector2& v)
+    inline Vector2 operator+ (float s, const Vector2& v)
     {
         return Vector2(s + v.x(), s + v.y());
     }
 
-    Vector2 operator+ (const Vector2& v, float s)
+    inline Vector2 operator+ (const Vector2& v, float s)
     {
         return Vector2(v.x() + s, v.y() + s);
     }
 
-    Vector2 operator+ (const Vector2& v1, const Vector2& v2)
+    inline Vector2 operator+ (const Vector2& v1, const Vector2& v2)
     {
         return Vector2(v1.x() + v2.x(), v1.y() + v2.y());
     }
 
-    Vector2 operator- (float s, const Vector2& v)
+    inline Vector2 operator- (float s, const Vector2& v)
     {
         return Vector2(s - v.x(), s - v.y());
     }
 
-    Vector2 operator- (const Vector2& v, float s)
+    inline Vector2 operator- (const Vector2& v, float s)
     {
         return Vector2(v.x() - s, v.y() - s);
     }
 
-    Vector2 operator- (const Vector2& v1, const Vector2& v2)
+    inline Vector2 operator- (const Vector2& v1, const Vector2& v2)
     {
         return Vector2(v1.x() - v2.x(), v1.y() - v2.y());
     }
 
-    Vector2 operator* (float s, const Vector2& v)
+    inline Vector2 operator* (float s, const Vector2& v)
     {
         return Vector2(s * v.x(), s * v.y());
     }
 
-    Vector2 operator* (const Vector2& v, float s)
+    inline Vector2 operator* (const Vector2& v, float s)
     {
         return Vector2(v.x() * s, v.y() * s);
     }
 
-    Vector2 operator* (const Vector2& v1, const Vector2& v2)
+    inline Vector2 operator* (const Vector2& v1, const Vector2& v2)
     {
         return Vector2(v1.x() * v2.x(), v1.y() * v2.y());
     }
 
-    Vector2 operator/ (float s, const Vector2& v)
+    inline Vector2 operator/ (float s, const Vector2& v)
     {
         return Vector2(s / v.x(), s / v.y());
     }
 
-    Vector2 operator/ (const Vector2& v, float s)
+    inline Vector2 operator/ (const Vector2& v, float s)
     {
         return Vector2(v.x() / s, v.y() / s);
     }
 
-    Vector2 operator/ (const Vector2& v1, const Vector2& v2)
+    inline Vector2 operator/ (const Vector2& v1, const Vector2& v2)
     {
         return Vector2(v1.x() / v2.x(), v1.y() / v2.y());
     }
@@ -149,62 +153,62 @@ namespace ed
     *   Vector3 Operators                                                          *
     *******************************************************************************/
 
-    Vector3 operator+ (float s, const Vector3& v)
+    inline Vector3 operator+ (float s, const Vector3& v)
     {
         return Vector3(s + v.x(), s + v.y(), s + v.z());
     }
 
-    Vector3 operator+ (const Vector3& v, float s)
+    inline Vector3 operator+ (const Vector3& v, float s)
     {
         return Vector3(v.x() + s, v.y() + s, v.z() + s);
     }
 
-    Vector3 operator+ (const Vector3& v1, const Vector3& v2)
+    inline Vector3 operator+ (const Vector3& v1, const Vector3& v2)
     {
         return Vector3(v1.x() + v2.x(), v1.y() + v2.y(), v1.z() + v2.z());
     }
 
-    Vector3 operator- (float s, const Vector3& v)
+    inline Vector3 operator- (float s, const Vector3& v)
     {
         return Vector3(s - v.x(), s - v.y(), s - v.z());
     }
 
-    Vector3 operator- (const Vector3& v, float s)
+    inline Vector3 operator- (const Vector3& v, float s)
     {
         return Vector3(v.x() - s, v.y() - s, v.z() - s);
     }
 
-    Vector3 operator- (const Vector3& v1, const Vector3& v2)
+    inline Vector3 operator- (const Vector3& v1, const Vector3& v2)
     {
         return Vector3(v1.x() - v2.x(), v1.y() - v2.y(), v1.z() - v2.z());
     }
 
-    Vector3 operator* (float s, const Vector3& v)
+    inline Vector3 operator* (float s, const Vector3& v)
     {
         return Vector3(s * v.x(), s * v.y(), s * v.z());
     }
 
-    Vector3 operator* (const Vector3& v, float s)
+    inline Vector3 operator* (const Vector3& v, float s)
     {
         return Vector3(v.x() * s, v.y() * s, v.z() * s);
     }
 
-    Vector3 operator* (const Vector3& v1, const Vector3& v2)
+    inline Vector3 operator* (const Vector3& v1, const Vector3& v2)
     {
         return Vector3(v1.x() * v2.x(), v1.y() * v2.y(), v1.z() * v2.z());
     }
 
-    Vector3 operator/ (float s, const Vector3& v)
+    inline Vector3 operator/ (float s, const Vector3& v)
     {
         return Vector3(s / v.x(), s / v.y(), s / v.z());
     }
 
-    Vector3 operator/ (const Vector3& v, float s)
+    inline Vector3 operator/ (const Vector3& v, float s)
     {
         return Vector3(v.x() / s, v.y() / s, v.z() / s);
     }
 
-    Vector3 operator/ (const Vector3& v1, const Vector3& v2)
+    inline Vector3 operator/ (const Vector3& v1, const Vector3& v2)
     {
         return Vector3(v1.x() / v2.x(), v1.y() / v2.y(), v1.z() / v2.z());
     }
@@ -320,7 +324,7 @@ namespace ed
         }
         return result;
     }
-    
+
     template <int Dimension>
     Vector<Dimension> Vector<Dimension>::max(const Vector<Dimension>& other) const
     {
@@ -341,19 +345,19 @@ namespace ed
         }
         return true;
     }
-    
+
     template <int Dimension>
     bool Vector<Dimension>::isNormalized(float epsilon) const
     {
         return fabsf(magnitude() - 1.0f) < epsilon;
     }
-    
+
     template <int Dimension>
     float Vector<Dimension>::distance(const Vector<Dimension>& point) const
     {
         (*this - point).magnitude();
     }
-    
+
     template <int Dimension>
     float Vector<Dimension>::squaredDistance(const Vector<Dimension>& point) const
     {
@@ -365,13 +369,13 @@ namespace ed
     {
         return *this / magnitude();
     }
-    
+
     template <int Dimension>
     float Vector<Dimension>::magnitude() const
     {
         return sqrtf(squaredMagnitude());
     }
-    
+
     template <int Dimension>
     float Vector<Dimension>::squaredMagnitude() const
     {
@@ -387,7 +391,7 @@ namespace ed
     {
         return mData[i];
     }
-    
+
     template <int Dimension>
     float& Vector<Dimension>::operator[] (int i)
     {
@@ -395,3 +399,5 @@ namespace ed
     }
 
 }
+
+#endif

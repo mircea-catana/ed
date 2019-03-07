@@ -1,6 +1,11 @@
 #pragma once
 
-#include "ed.h"
+#ifndef _FRAMEBUFFER_H_
+#define _FRAMEBUFFER_H_
+
+#include <vector>
+#include <fstream>
+
 #include "vector.h"
 
 namespace ed
@@ -31,7 +36,8 @@ namespace ed
         uint32_t height() const;
 
         void writePPM(const char* filepath, bool yFlip = true) const;
-        
+        void writeData(std::vector<uint8_t>& data) const;
+
     private:
         uint32_t           mWidth;
         uint32_t           mHeight;
@@ -116,6 +122,23 @@ namespace ed
         fileStream.close();
     }
 
+    void Image::writeData(std::vector<uint8_t>& data) const
+    {
+        data.reserve(mWidth * mHeight * 4u);
+        std::fill(data.begin(), data.end(), 255u);
+
+        for (int32_t j = mHeight-1; j >= 0; --j) {
+            const uint32_t jw = j * mWidth;
+            for (uint32_t i = 0; i < mWidth; ++i) {
+                const uint32_t idx = jw + i;
+                data[idx * 4u + 0u] = static_cast<uint8_t>(mData[idx].r);
+                data[idx * 4u + 1u] = static_cast<uint8_t>(mData[idx].g);
+                data[idx * 4u + 2u] = static_cast<uint8_t>(mData[idx].b);
+                data[idx * 4u + 3u] = static_cast<uint8_t>(255u);
+            }
+        }
+    }
+
     Framebuffer::Framebuffer(uint32_t width, uint32_t height)
         : mOutput(width, height)
     {
@@ -126,3 +149,5 @@ namespace ed
         return mOutput;
     }
 }
+
+#endif

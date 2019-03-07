@@ -1,6 +1,10 @@
 #pragma once
 
-#include "ed.h"
+#ifndef _RASTERIZER_H_
+#define _RASTERIZER_H_
+
+#include <cmath>
+
 #include "vector.h"
 #include "framebuffer.h"
 
@@ -54,3 +58,5 @@ namespace ed
         }
     }
 }
+
+#endif
