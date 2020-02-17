@@ -11,4 +11,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 file(GLOB HDRS "src/*.h")
 file(GLOB SRCS "src/*.cpp")
 
+include_directories(${PROJECT_NAME} thirdparty/glm/)
+
 add_executable(${PROJECT_NAME} ${HDRS} ${SRCS})
