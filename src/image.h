@@ -20,7 +20,7 @@ public:
 
 public:
     Image(uint32_t width, uint32_t height);
-    Image(uint32_t width, uint32_t height, std::vector<Color> data);
+    Image(uint32_t width, uint32_t height, const std::vector<Color>& data);
     Image(const char* filepath);
 
     void load(const char* filepath);
@@ -31,10 +31,10 @@ public:
 
     std::vector<Color>& data();
 
-    void clear(Color color);
+    void clear(const Color& color);
 
     Color getTexel(uint32_t x, uint32_t y) const;
-    void  setTexel(uint32_t x, uint32_t y, Color color);
+    void  setTexel(uint32_t x, uint32_t y, const Color& color);
 
 private:
     uint32_t mWidth;

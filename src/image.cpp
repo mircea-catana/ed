@@ -16,7 +16,7 @@ Image::Image(uint32_t width, uint32_t height)
     mData = std::vector<Color>(width * height);
 }
 
-Image::Image(uint32_t width, uint32_t height, std::vector<Color> data)
+Image::Image(uint32_t width, uint32_t height, const std::vector<Color>& data)
     : mWidth(width)
     , mHeight(height)
     , mData(data)
@@ -100,7 +100,7 @@ std::vector<Color>& Image::data()
     return mData;
 }
 
-void Image::clear(Color color)
+void Image::clear(const Color& color)
 {
     std::fill(mData.begin(), mData.end(), color);
 }
@@ -110,7 +110,7 @@ Color Image::getTexel(uint32_t x, uint32_t y) const
     return mData[y * mWidth + x];
 }
 
-void  Image::setTexel(uint32_t x, uint32_t y, Color color)
+void  Image::setTexel(uint32_t x, uint32_t y, const Color& color)
 {
     mData[y * mWidth + x] = color;
 }
