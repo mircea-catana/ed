@@ -1,48 +1,70 @@
 #include <iostream>
+#include <vector>
 
 #include "aabb.h"
+#include "camera.h"
 #include "image.h"
 #include "mesh.h"
+#include "rasterizer.h"
 #include "triangle.h"
 #include "vertex.h"
 
-void printVec3(const glm::vec3& v)
+static const float kWidth  = 1920.0f;
+static const float kHeight = 1080.0f;
+
+glm::vec3 ndcToScreen(const glm::vec4& v)
 {
-    std::cout << "V: " << v.x << " " << v.y << " " << v.z << std::endl;
+    return glm::vec3((v.x + 1) * kWidth * 0.5,
+                     (v.y + 1) * kHeight * 0.5,
+                     v.z);
 }
 
 int main()
 {
-    // ed::Mesh mesh = ed::Mesh("/work/projects/softwarerenderer/assets/suzanne.obj");
-    // auto& triangles = mesh.getTriangles();
+    ed::Color grey(80, 80, 80, 255);
+    ed::Image output(kWidth, kHeight);
+    output.clear(grey);
 
-    // std::cout << triangles[0].v1.position.x << " "
-    //           << triangles[0].v1.position.y << " "
-    //           << triangles[0].v1.position.z << std::endl;
+    ed::Mesh  mesh("/data/projects/rendering/ed/assets/FlareGun.obj");
+    ed::Image texture("/data/projects/rendering/ed/assets/FlareGun.png");
 
-    // ed::Image image = ed::Image("/work/projects/softwarerenderer/assets/dog.jpg");
-    // std::cout << image.width() << " " << image.height() << std::endl;
-    // image.store("/work/projects/softwarerenderer/dog.png", ed::Image::ImageType::ePng);
+    const float aspect = kWidth / kHeight;
+    ed::Camera camera(45.0f, aspect, 0.1f, 600.0f);
+    camera.lookAt(glm::vec3(0.0f, 0.0f, -10.0f),
+                  glm::vec3(0.0f, 0.0f, 0.0f),
+                  glm::vec3(0.0f, 1.0f, 0.0f));
 
-    // ed::Image image2 = ed::Image(20, 20);
-    // image2.clear(ed::Color(255, 0, 0, 255));
-    // image2.store("/work/projects/softwarerenderer/red.png", ed::Image::ImageType::eJpg);
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view  = camera.getView();
+    glm::mat4 proj  = camera.getProjection();
 
-    ed::Vertex v1(glm::vec3(0.0, 2.0, 0.0));
-    ed::Vertex v2(glm::vec3(0.0, 0.0, 0.0));
-    ed::Vertex v3(glm::vec3(1.0, 0.0, 0.0));
+    std::vector<float> zBuffer(kWidth * kHeight);
+    std::fill(zBuffer.begin(), zBuffer.end(), -std::numeric_limits<float>::max());
 
-    ed::Triangle t(v1, v2, v3);
+    std::vector<ed::Triangle>& triangles = mesh.getTriangles();
+    for (ed::Triangle t : triangles) {
+        glm::vec4 p1 = glm::vec4(t.v1.position.x, t.v1.position.y, t.v1.position.z, 1.0f);
+        glm::vec4 p2 = glm::vec4(t.v2.position.x, t.v2.position.y, t.v2.position.z, 1.0f);
+        glm::vec4 p3 = glm::vec4(t.v3.position.x, t.v3.position.y, t.v3.position.z, 1.0f);
 
-    glm::vec3 bary = t.barycentricCoordinates(glm::vec3(1.0, 0.0, 0.0));
-    printVec3(bary);
+        p1 = proj * view * model * p1;
+        p2 = proj * view * model * p2;
+        p3 = proj * view * model * p3;
 
-    ed::AABB aabb = t.aabb();
-    printVec3(aabb.min());
-    printVec3(aabb.max());
+        t.v1.position = ndcToScreen(p1);
+        t.v2.position = ndcToScreen(p2);
+        t.v3.position = ndcToScreen(p3);
 
-    glm::vec3 normal = t.normal();
-    printVec3(normal);
+        t.computeAABB();
+
+        t.v1.uv *= glm::vec2(texture.width(), texture.height());
+        t.v2.uv *= glm::vec2(texture.width(), texture.height());
+        t.v3.uv *= glm::vec2(texture.width(), texture.height());
+
+        ed::drawTriangleTextured(output, zBuffer, t, texture);
+    }
+
+    output.store("/data/projects/rendering/ed/build/test.png", ed::Image::ImageType::ePng);
 
     return 0;
 }

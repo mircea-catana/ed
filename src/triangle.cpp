@@ -52,12 +52,16 @@ glm::vec3 Triangle::barycentricCoordinates(const glm::vec3& point) const
 
     float w = 1.0f - u - v;
 
+    // Dealing with fp precision
+    if (std::abs(w) < 1e-6f)
+        w = 0.0;
+
     return glm::vec3(u, v, w);
 }
 
 AABB Triangle::aabb() const
 {
-    return mBox;
+    return mBbox;
 }
 
 void Triangle::computeAABB()
@@ -81,7 +85,7 @@ void Triangle::computeAABB()
     max.y = std::max(max.y, maxY);
     max.z = std::max(max.z, maxZ);
 
-    mBox = AABB(min, max);
+    mBbox = AABB(min, max);
 }
 
 } // namespace ed

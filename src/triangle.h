@@ -1,5 +1,6 @@
 #pragma once
 
+#define GLM_SWIZZLE
 #include <glm/glm.hpp>
 
 #include "vertex.h"
@@ -22,15 +23,13 @@ public:
     glm::vec2 uv(const glm::vec3& point) const;
 
     AABB aabb() const;
+    void computeAABB();
 
     Vertex v1;
     Vertex v2;
     Vertex v3;
 
 private:
-    AABB mBox;
-
-private:
-    void computeAABB();
+    AABB mBbox;
 };
 } // namespace ed

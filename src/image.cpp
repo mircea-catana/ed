@@ -33,6 +33,8 @@ void Image::load(const char* filepath)
     int width;
     int height;
     int channels;
+
+    stbi_set_flip_vertically_on_load(true);
     unsigned char* data = stbi_load(filepath, &width, &height, &channels, STBI_rgb_alpha);
 
     mData.reserve(width * height);
@@ -68,6 +70,7 @@ void Image::store(const char* filepath, ImageType type)
         }
     }
 
+    stbi_flip_vertically_on_write(true);
     switch (type) {
         case ImageType::eJpg:
         {
