@@ -21,12 +21,12 @@ glm::vec3 ndcToScreen(const glm::vec4& v)
 
 int main()
 {
-    ed::Color grey(80, 80, 80, 255);
-    ed::Image output(kWidth, kHeight);
+    ed::ColorRGBA grey(80, 80, 80, 255);
+    ed::Image<ed::ColorRGBA> output(kWidth, kHeight);
     output.clear(grey);
 
     ed::Mesh  mesh("/work/projects/softwarerenderer/assets/Ivysaur.obj");
-    ed::Image texture("/work/projects/softwarerenderer/assets/Ivysaur_Diffuse.jpg");
+    ed::Image<ed::ColorRGBA> texture("/work/projects/softwarerenderer/assets/Ivysaur_Diffuse.jpg");
 
     const float aspect = kWidth / kHeight;
     ed::Camera camera(45.0f, aspect, 0.1f, 600.0f);
@@ -38,8 +38,8 @@ int main()
     glm::mat4 view  = camera.getView();
     glm::mat4 proj  = camera.getProjection();
 
-    std::vector<float> zBuffer(kWidth * kHeight);
-    std::fill(zBuffer.begin(), zBuffer.end(), -std::numeric_limits<float>::max());
+    ed::Image<ed::ColorR> zBuffer(kWidth, kHeight);
+    zBuffer.clear(ed::ColorR(-std::numeric_limits<float>::max()));
 
     std::vector<ed::Triangle>& triangles = mesh.getTriangles();
     for (ed::Triangle t : triangles) {
@@ -61,10 +61,10 @@ int main()
         t.v2.uv *= glm::vec2(texture.width(), texture.height());
         t.v3.uv *= glm::vec2(texture.width(), texture.height());
 
-        ed::drawTriangleTextured(output, zBuffer, t, texture);
+        ed::drawTriangleTextured<ed::ColorRGBA>(output, zBuffer, t, texture);
     }
 
-    output.store("/work/projects/softwarerenderer/build/test.png", ed::Image::ImageType::ePng);
+    output.store("/work/projects/softwarerenderer/build/test.png", ed::ImageType::ePng);
 
     return 0;
 }
