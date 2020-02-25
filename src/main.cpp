@@ -25,13 +25,13 @@ int main()
     ed::Image output(kWidth, kHeight);
     output.clear(grey);
 
-    ed::Mesh  mesh("/data/projects/rendering/ed/assets/FlareGun.obj");
-    ed::Image texture("/data/projects/rendering/ed/assets/FlareGun.png");
+    ed::Mesh  mesh("/work/projects/softwarerenderer/assets/Ivysaur.obj");
+    ed::Image texture("/work/projects/softwarerenderer/assets/Ivysaur_Diffuse.jpg");
 
     const float aspect = kWidth / kHeight;
     ed::Camera camera(45.0f, aspect, 0.1f, 600.0f);
-    camera.lookAt(glm::vec3(0.0f, 0.0f, -10.0f),
-                  glm::vec3(0.0f, 0.0f, 0.0f),
+    camera.lookAt(glm::vec3(0.0f, -1.0f, 2.5f),
+                  glm::vec3(0.0f, 0.5f, 0.0f),
                   glm::vec3(0.0f, 1.0f, 0.0f));
 
     glm::mat4 model = glm::mat4(1.0f);
@@ -51,9 +51,9 @@ int main()
         p2 = proj * view * model * p2;
         p3 = proj * view * model * p3;
 
-        t.v1.position = ndcToScreen(p1);
-        t.v2.position = ndcToScreen(p2);
-        t.v3.position = ndcToScreen(p3);
+        t.v1.position = ndcToScreen(p1/p1.w);
+        t.v2.position = ndcToScreen(p2/p2.w);
+        t.v3.position = ndcToScreen(p3/p3.w);
 
         t.computeAABB();
 
@@ -64,7 +64,7 @@ int main()
         ed::drawTriangleTextured(output, zBuffer, t, texture);
     }
 
-    output.store("/data/projects/rendering/ed/build/test.png", ed::Image::ImageType::ePng);
+    output.store("/work/projects/softwarerenderer/build/test.png", ed::Image::ImageType::ePng);
 
     return 0;
 }

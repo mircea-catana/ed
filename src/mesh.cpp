@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 
 namespace ed
 {
@@ -54,20 +55,51 @@ Mesh::Mesh(const char* filepath)
             mUVs.push_back(uv);
 
         } else if (!line.compare(0, 2, "f ")) {
+            int numVertices = std::count_if(line.begin(), line.end(), [](char c) { return c == ' '; });
+
             char placeholder;
-            Face face;
+
+            std::vector<uint32_t> positions = std::vector<uint32_t>();
+            std::vector<uint32_t> normals = std::vector<uint32_t>();
+            std::vector<uint32_t> uvs = std::vector<uint32_t>();
+
+            uint32_t p, n, u;
 
             stringStream >> placeholder;
-            for (uint32_t i = 0; i < 3; ++i) {
-                stringStream >> face.positions[i] >> placeholder >> face.uvs[i] >> placeholder >> face.normals[i];
-
+            while (stringStream >> p >> placeholder >> u >> placeholder >> n) {
                 // OBJ files are indexed from 1
-                --face.positions[i];
-                --face.normals[i];
-                --face.uvs[i];
+                positions.push_back(p - 1);
+                normals.push_back(n - 1);
+                uvs.push_back(u - 1);
             }
 
-            mFaces.push_back(face);
+            // OBJ files store non-triangle faces as odd order triangle strips
+            Face face1;
+            for (size_t i = 0; i < 3; ++i) {
+                face1.positions[i] = positions[i];
+                face1.normals[i] = normals[i];
+                face1.uvs[i] = uvs[i];
+            }
+
+            mFaces.push_back(face1);
+
+            for (size_t i = 3; i < numVertices; ++i) {
+                Face face;
+
+                face.positions[0] = positions[i - 3];
+                face.normals[0] = normals[i - 3];
+                face.uvs[0] = uvs[i - 3];
+
+                face.positions[1] = positions[i - 1];
+                face.normals[1] = normals[i - 1];
+                face.uvs[1] = uvs[i - 1];
+
+                face.positions[2] = positions[i];
+                face.normals[2] = normals[i];
+                face.uvs[2] = uvs[i];
+
+                mFaces.push_back(face);
+            }
         }
     }
 
