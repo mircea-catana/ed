@@ -22,12 +22,10 @@ void SimpleShader::vertex(const Triangle& triangle)
 
 glm::vec4 SimpleShader::fragment(const glm::vec3& barycentric)
 {
-    glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 normal   = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec2 uv       = glm::vec2(0.0f, 0.0f);
 
     for (size_t i = 0; i < 3; ++i) {
-        position += ndcCoordinates[i] * barycentric[i];
         normal   += vNormal[i] * barycentric[i];
         uv       += vUV[i] * barycentric[i];
     }
@@ -35,12 +33,13 @@ glm::vec4 SimpleShader::fragment(const glm::vec3& barycentric)
     normal = glm::normalize(normal);
 
     glm::vec4 light = *MVP * glm::vec4(lightPosition.x, lightPosition.y, lightPosition.z, 1.0);
-    glm::vec3 lightDirection = glm::normalize(light.xyz()/light.w - position);
+    glm::vec3 lightDirection = glm::normalize(light.xyz()/light.w);
 
     float intensity = std::max(glm::dot(normal, lightDirection), 0.0f);
 
-    const ColorRGBA& texel = texture->getTexel(uv.x * (texture->width() - 1), uv.y * (texture->height() - 1));
-    return texel * 0.4f + texel * intensity * 0.6f;
+    ColorRGBA texel = texture->getTexel(uv.x * (texture->width() - 1), uv.y * (texture->height() - 1));
+    texel = ColorRGBA(texel.r * intensity, texel.g * intensity, texel.b * intensity, texel.a);
+    return texel;
 }
 
 } // namespace ed
