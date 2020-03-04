@@ -52,8 +52,9 @@ int main()
 
     //---------------------- SHADER ------------------------
     ed::SimpleShader shader;
-    shader.MVP = &MVP;
-    shader.texture = &texture;
+    shader.MVP           = &MVP;
+    shader.texture       = &texture;
+    shader.lightPosition = glm::vec3(-8.0f, 0.0f, 8.0f);
 
     //---------------------- RENDER ------------------------
     std::vector<ed::Triangle>& triangles = mesh.getTriangles();
