@@ -11,6 +11,9 @@ public:
     AABB();
     AABB(const glm::vec3& min, const glm::vec3& max);
 
+    bool isValid() const;
+    void extend(const glm::vec3& point);
+
     glm::vec3 min() const;
     glm::vec3 max() const;
 

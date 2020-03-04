@@ -7,7 +7,9 @@
 #include <glm/glm.hpp>
 
 #include "aabb.h"
+#include "framebuffer.h"
 #include "image.h"
+#include "shader.h"
 #include "triangle.h"
 
 namespace ed
@@ -75,7 +77,7 @@ void drawTriangleFill(Image<ColorT>& image, const Triangle& triangle, const Colo
     for (size_t j = bbox.min().y; j <= bbox.max().y; ++j) {
         for (size_t i = bbox.min().x; i <= bbox.max().x; ++i) {
             glm::vec3 point = glm::vec3(i, j, 0.0);
-            glm::vec3 barycentric = triangle.barycentricCoordinates(point);
+            glm::vec3 barycentric = triangle.barycentric(point);
             if (barycentric.x >= 0.0 && barycentric.y >= 0.0 && barycentric.z >= 0.0) {
                 image.setTexel(i, j, color);
             }
@@ -83,41 +85,6 @@ void drawTriangleFill(Image<ColorT>& image, const Triangle& triangle, const Colo
     }
 }
 
-template <typename ColorT>
-void drawTriangleTextured(Image<ColorT>& image, Image<ColorR>& zBuffer, const Triangle& triangle, const Image<ColorT>& texture)
-{
-    AABB bbox = triangle.aabb();
+void drawTriangle(Framebuffer& framebuffer, const Triangle& triangle, Shader* shader);
 
-    for (size_t j = bbox.min().y; j <= bbox.max().y; ++j) {
-        for (size_t i = bbox.min().x; i <= bbox.max().x; ++i) {
-
-            if (i < 0 || j < 0 || i > image.width()-1 || j > image.height() - 1)
-                continue;
-
-            glm::vec3 point = glm::vec3(i, j, 0.0);
-            glm::vec3 barycentric = triangle.barycentricCoordinates(point);
-
-            if (barycentric.x < 0.0 || barycentric.y < 0.0 || barycentric.z < 0.0)
-                continue;
-
-            // TODO: This is borked
-            float depth = triangle.v1.position.z * barycentric.x +
-                          triangle.v2.position.z * barycentric.y +
-                          triangle.v3.position.z * barycentric.z;
-
-            if (zBuffer.getTexel(i, j) > depth)
-                continue;
-
-            zBuffer.setTexel(i, j, depth);
-
-            // Interpolate vertex UVs
-            glm::vec2 uv = triangle.v1.uv * barycentric.x +
-                           triangle.v2.uv * barycentric.y +
-                           triangle.v3.uv * barycentric.z;
-
-            const ColorT& texel = texture.getTexel(uv.x, uv.y);
-            image.setTexel(i, j, texel);
-        }
-    }
-}
 } // namespace ed

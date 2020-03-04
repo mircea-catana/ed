@@ -1,13 +1,17 @@
 #include <iostream>
 #include <vector>
+#include <memory>
 
 #include "aabb.h"
 #include "camera.h"
+#include "framebuffer.h"
 #include "image.h"
 #include "mesh.h"
 #include "rasterizer.h"
 #include "triangle.h"
 #include "vertex.h"
+
+#include <glm/gtc/matrix_transform.hpp>
 
 static const float kWidth  = 1920.0f;
 static const float kHeight = 1080.0f;
@@ -21,50 +25,44 @@ glm::vec3 ndcToScreen(const glm::vec4& v)
 
 int main()
 {
-    ed::ColorRGBA grey(80, 80, 80, 255);
-    ed::Image<ed::ColorRGBA> output(kWidth, kHeight);
-    output.clear(grey);
+    //---------------------- FRAMEBUFFER ------------------------
+    ed::ColorAttachmentT colorA(new ed::Image<ed::ColorRGBA>(kWidth, kHeight));
+    colorA->clear(ed::ColorRGBA(80, 80, 80, 255));
 
-    ed::Mesh  mesh("/work/projects/softwarerenderer/assets/Ivysaur.obj");
-    ed::Image<ed::ColorRGBA> texture("/work/projects/softwarerenderer/assets/Ivysaur_Diffuse.jpg");
+    ed::DSAttachmentT depthA(new ed::Image<ed::ColorR>(kWidth, kHeight));
+    depthA->clear(ed::ColorR(std::numeric_limits<float>::min()));
 
+    ed::Framebuffer framebuffer(colorA, depthA);
+
+    //---------------------- MODEL ------------------------
+    ed::Mesh  mesh("/Users/mirceac/projects/softwarerenderer/assets/FlareGun.obj");
+    ed::Image<ed::ColorRGBA> texture("/Users/mirceac/projects/softwarerenderer/assets/FlareGun.png");
+
+    //---------------------- CAMERA ------------------------
     const float aspect = kWidth / kHeight;
     ed::Camera camera(45.0f, aspect, 0.1f, 600.0f);
-    camera.lookAt(glm::vec3(0.0f, -1.0f, 2.5f),
-                  glm::vec3(0.0f, 0.5f, 0.0f),
+    camera.lookAt(glm::vec3(2.5f, 0.0f, 1.0f),
+                  glm::vec3(0.0f, 0.0f, 0.0f),
                   glm::vec3(0.0f, 1.0f, 0.0f));
 
-    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(2.5f, 2.5f, 2.5f));
     glm::mat4 view  = camera.getView();
     glm::mat4 proj  = camera.getProjection();
+    glm::mat4 MVP   = proj * view * model;
 
-    ed::Image<ed::ColorR> zBuffer(kWidth, kHeight);
-    zBuffer.clear(ed::ColorR(-std::numeric_limits<float>::max()));
+    //---------------------- SHADER ------------------------
+    ed::SimpleShader shader;
+    shader.MVP = &MVP;
+    shader.texture = &texture;
 
+    //---------------------- RENDER ------------------------
     std::vector<ed::Triangle>& triangles = mesh.getTriangles();
-    for (ed::Triangle t : triangles) {
-        glm::vec4 p1 = glm::vec4(t.v1.position.x, t.v1.position.y, t.v1.position.z, 1.0f);
-        glm::vec4 p2 = glm::vec4(t.v2.position.x, t.v2.position.y, t.v2.position.z, 1.0f);
-        glm::vec4 p3 = glm::vec4(t.v3.position.x, t.v3.position.y, t.v3.position.z, 1.0f);
-
-        p1 = proj * view * model * p1;
-        p2 = proj * view * model * p2;
-        p3 = proj * view * model * p3;
-
-        t.v1.position = ndcToScreen(p1/p1.w);
-        t.v2.position = ndcToScreen(p2/p2.w);
-        t.v3.position = ndcToScreen(p3/p3.w);
-
-        t.computeAABB();
-
-        t.v1.uv *= glm::vec2(texture.width(), texture.height());
-        t.v2.uv *= glm::vec2(texture.width(), texture.height());
-        t.v3.uv *= glm::vec2(texture.width(), texture.height());
-
-        ed::drawTriangleTextured<ed::ColorRGBA>(output, zBuffer, t, texture);
+    for (ed::Triangle& t : triangles) {
+        ed::drawTriangle(framebuffer, t, &shader);
     }
 
-    output.store("/work/projects/softwarerenderer/build/test.png", ed::ImageType::ePng);
+    //---------------------- WRITE TO DISK ------------------------
+    colorA->store("/Users/mirceac/projects/softwarerenderer/build/test.png", ed::ImageType::ePng);
 
     return 0;
 }

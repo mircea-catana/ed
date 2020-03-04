@@ -22,26 +22,46 @@ glm::vec3 Triangle::normal() const
 
 glm::vec3 Triangle::normal(const glm::vec3& point) const
 {
-    glm::vec3 barycentric = barycentricCoordinates(point);
-    return v1.normal * barycentric.x +
-           v2.normal * barycentric.y +
-           v3.normal * barycentric.z;
+    glm::vec3 bc = barycentric(point);
+    return v1.normal * bc.x +
+           v2.normal * bc.y +
+           v3.normal * bc.z;
 }
 
 glm::vec2 Triangle::uv(const glm::vec3& point) const
 {
-    glm::vec3 barycentric = barycentricCoordinates(point);
-    return v1.uv * barycentric.x +
-           v2.uv * barycentric.y +
-           v3.uv * barycentric.z;
+    glm::vec3 bc = barycentric(point);
+    return v1.uv * bc.x +
+           v2.uv * bc.y +
+           v3.uv * bc.z;
 }
 
-glm::vec3 Triangle::barycentricCoordinates(const glm::vec3& point) const
+glm::vec3 Triangle::barycentric(const glm::vec3& point) const
 {
     const glm::vec3& p1 = v1.position;
     const glm::vec3& p2 = v2.position;
     const glm::vec3& p3 = v3.position;
 
+    float det = (p1.x - p3.x) * (p2.y - p3.y) + (p3.x - p2.x) * (p1.y - p3.y);
+
+    float u   = (point.x - p3.x) * (p2.y - p3.y) + (p3.x - p2.x) * (point.y - p3.y);
+    float v   = (point.x - p3.x) * (p3.y - p1.y) + (p1.x - p3.x) * (point.y - p3.y);
+
+    u /= det;
+    v /= det;
+
+    float w = 1.0f - u - v;
+
+    // Dealing with fp precision
+    if (std::abs(w) < 1e-6f)
+        w = 0.0;
+
+    return glm::vec3(u, v, w);
+}
+
+glm::vec3 Triangle::barycentric(const glm::vec2& p1, const glm::vec2& p2,
+                                const glm::vec2& p3, const glm::vec2& point) const
+{
     float det = (p1.x - p3.x) * (p2.y - p3.y) + (p3.x - p2.x) * (p1.y - p3.y);
 
     float u   = (point.x - p3.x) * (p2.y - p3.y) + (p3.x - p2.x) * (point.y - p3.y);
@@ -87,5 +107,29 @@ void Triangle::computeAABB()
 
     mBbox = AABB(min, max);
 }
+
+
+Vertex Triangle::operator [] (size_t index) const
+{
+    if (index == 0) {
+        return v1;
+    } else if (index == 1) {
+        return v2;
+    }
+
+    return v3;
+}
+
+Vertex& Triangle::operator [] (size_t index)
+{
+    if (index == 0) {
+        return v1;
+    } else if (index == 1) {
+        return v2;
+    }
+
+    return v3;
+}
+
 
 } // namespace ed
