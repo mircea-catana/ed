@@ -38,12 +38,15 @@ void drawTriangle(Framebuffer& framebuffer, const Triangle& triangle, Shader* sh
     bbox.extend(glm::vec3(screenCoordinates[1].x, screenCoordinates[1].y, 0.0f));
     bbox.extend(glm::vec3(screenCoordinates[2].x, screenCoordinates[2].y, 0.0f));
 
+    AABB screenBox(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(cBuffer.width() - 1.0f, cBuffer.height() - 1.0f, 0.0f));
+
+    bbox = bbox.intersect(screenBox);
+    if (!bbox.isValid())
+        return;
+
     //---------------------- FRAGMENT ------------------------
     for (size_t j = bbox.min().y; j <= bbox.max().y; ++j) {
         for (size_t i = bbox.min().x; i <= bbox.max().x; ++i) {
-
-            if (i < 0 || j < 0 || i > cBuffer.width()-1 || j > cBuffer.height() - 1)
-                continue;
 
             glm::vec2 point = glm::vec2(i, j);
             glm::vec3 barycentric_screen = triangle.barycentric(screenCoordinates[0], screenCoordinates[1], screenCoordinates[2], point);
@@ -59,7 +62,7 @@ void drawTriangle(Framebuffer& framebuffer, const Triangle& triangle, Shader* sh
                           shader->clipCoordinates[1].z * barycentric_clip.y +
                           shader->clipCoordinates[2].z * barycentric_clip.z;
 
-            if (zBuffer.getTexel(i, j) > depth)
+            if (zBuffer.getTexel(i, j) < depth)
                 continue;
 
             zBuffer.setTexel(i, j, depth);

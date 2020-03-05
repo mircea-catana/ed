@@ -30,7 +30,7 @@ int main()
     colorA->clear(ed::ColorRGBA(80, 80, 80, 255));
 
     ed::DSAttachmentT depthA(new ed::Image<ed::ColorR>(kWidth, kHeight));
-    depthA->clear(ed::ColorR(std::numeric_limits<float>::min()));
+    depthA->clear(ed::ColorR(std::numeric_limits<float>::max()));
 
     ed::Framebuffer framebuffer(colorA, depthA);
 
@@ -40,12 +40,12 @@ int main()
 
     //---------------------- CAMERA ------------------------
     const float aspect = kWidth / kHeight;
-    ed::Camera camera(45.0f, aspect, 0.1f, 600.0f);
-    camera.lookAt(glm::vec3(2.5f, 0.0f, 1.0f),
+    ed::Camera camera(45.0f, aspect, 0.1f, 150.0f);
+    camera.lookAt(glm::vec3(1.5f, 0.4f, -1.75f),
                   glm::vec3(0.0f, 0.0f, 0.0f),
                   glm::vec3(0.0f, 1.0f, 0.0f));
 
-    glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(2.5f, 2.5f, 2.5f));
+    glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(2.5f, 2.5f, 2.5f));
     glm::mat4 view  = camera.getView();
     glm::mat4 proj  = camera.getProjection();
     glm::mat4 MVP   = proj * view * model;
@@ -54,7 +54,7 @@ int main()
     ed::SimpleShader shader;
     shader.MVP           = &MVP;
     shader.texture       = &texture;
-    shader.lightPosition = glm::vec3(-8.0f, 0.0f, -8.0f);
+    shader.lightPosition = glm::vec3(2.0f, 1.0f, 4.0f);
 
     //---------------------- RENDER ------------------------
     std::vector<ed::Triangle>& triangles = mesh.getTriangles();

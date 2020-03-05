@@ -12,7 +12,9 @@ public:
     AABB(const glm::vec3& min, const glm::vec3& max);
 
     bool isValid() const;
+
     void extend(const glm::vec3& point);
+    AABB intersect(const AABB& other) const;
 
     glm::vec3 min() const;
     glm::vec3 max() const;

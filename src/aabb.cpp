@@ -40,6 +40,14 @@ void AABB::extend(const glm::vec3& point)
     mMax.z = std::max(mMax.z, point.z);
 }
 
+AABB AABB::intersect(const AABB& other) const
+{
+    glm::vec3 min = glm::max(mMin, other.min());
+    glm::vec3 max = glm::min(mMax, other.max());
+
+    return AABB(min, max);
+}
+
 glm::vec3 AABB::min() const
 {
     return mMin;

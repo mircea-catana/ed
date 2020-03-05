@@ -12,7 +12,7 @@ Camera::Camera(float fov, float aspect, float near, float far)
     , mFar(far)
 {
     mView       = glm::mat4(1.0);
-    mProjection = glm::perspective(glm::radians(mFov), mAspect, mNear, mFar);
+    mProjection = glm::perspective(mFov, mAspect, mNear, mFar);
 }
 
 void Camera::lookAt(const glm::vec3& position, const glm::vec3& target, const glm::vec3& up)
