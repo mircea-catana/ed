@@ -35,14 +35,14 @@ int main()
     ed::Framebuffer framebuffer(colorA, depthA);
 
     //---------------------- MODEL ------------------------
-    ed::Mesh  mesh("/Users/mirceac/projects/softwarerenderer/assets/FlareGun.obj");
-    ed::Image<ed::ColorRGBA> texture("/Users/mirceac/projects/softwarerenderer/assets/FlareGun.png");
+    ed::Mesh  mesh("/data/projects/rendering/ed/assets/FlareGun.obj");
+    ed::Image<ed::ColorRGBA> texture("/data/projects/rendering/ed/assets/FlareGun.png");
 
     //---------------------- CAMERA ------------------------
     const float aspect = kWidth / kHeight;
     ed::Camera camera(45.0f, aspect, 0.1f, 150.0f);
-    camera.lookAt(glm::vec3(1.5f, 0.4f, -1.75f),
-                  glm::vec3(0.0f, 0.0f, 0.0f),
+    camera.lookAt(glm::vec3(0.75f, 0.4f, -1.0f),
+                  glm::vec3(-0.5f, 0.0f, 0.0f),
                   glm::vec3(0.0f, 1.0f, 0.0f));
 
     glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(2.5f, 2.5f, 2.5f));
@@ -51,10 +51,11 @@ int main()
     glm::mat4 MVP   = proj * view * model;
 
     //---------------------- SHADER ------------------------
+    glm::vec4 light = MVP * glm::vec4(2.0f, 1.0f, 4.0f, 1.0);
     ed::SimpleShader shader;
-    shader.MVP           = &MVP;
-    shader.texture       = &texture;
-    shader.lightPosition = glm::vec3(2.0f, 1.0f, 4.0f);
+    shader.MVP             = &MVP;
+    shader.texture         = &texture;
+    shader.uLightDirection = glm::normalize(light.xyz());
 
     //---------------------- RENDER ------------------------
     std::vector<ed::Triangle>& triangles = mesh.getTriangles();
@@ -63,7 +64,7 @@ int main()
     }
 
     //---------------------- WRITE TO DISK ------------------------
-    colorA->store("/Users/mirceac/projects/softwarerenderer/build/test.png", ed::ImageType::ePng);
+    colorA->store("/data/projects/rendering/ed/build/test.png", ed::ImageType::ePng);
 
     return 0;
 }

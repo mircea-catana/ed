@@ -70,21 +70,6 @@ void drawTriangleWireframe(Image<ColorT>& image, const Triangle& triangle, const
     drawLine(image, triangle.v3.position.xy(), triangle.v1.position.xy(), color);
 }
 
-template <typename ColorT>
-void drawTriangleFill(Image<ColorT>& image, const Triangle& triangle, const ColorT& color)
-{
-    AABB bbox = triangle.aabb();
-    for (size_t j = bbox.min().y; j <= bbox.max().y; ++j) {
-        for (size_t i = bbox.min().x; i <= bbox.max().x; ++i) {
-            glm::vec3 point = glm::vec3(i, j, 0.0);
-            glm::vec3 barycentric = triangle.barycentric(point);
-            if (barycentric.x >= 0.0 && barycentric.y >= 0.0 && barycentric.z >= 0.0) {
-                image.setTexel(i, j, color);
-            }
-        }
-    }
-}
-
 void drawTriangle(Framebuffer& framebuffer, const Triangle& triangle, Shader* shader);
 
 } // namespace ed

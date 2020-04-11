@@ -31,7 +31,9 @@ struct SimpleShader : public Shader
 
     // Fragment Shader Inputs
     Image<ColorRGBA>* texture;
-    glm::vec3 lightPosition;
+
+    // Uniforms
+    glm::vec3 uLightDirection;
 
     // Shader Context (Varyings)
     std::array<glm::vec2, 3> vUV;
